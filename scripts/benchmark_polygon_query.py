@@ -51,7 +51,9 @@ if __name__ == "__main__":
     ax.set_title("Polygon Query Benchmark")
     ax.set_xlabel("Number of Points")
     ax.set_ylabel("Execution Time (s)")
-    save_dir = "figures"
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    save_dir = "../figures"
     os.makedirs(save_dir, exist_ok=True)
     plt.savefig(
         os.path.join(save_dir, "benchmark_polygon_query.png"),
