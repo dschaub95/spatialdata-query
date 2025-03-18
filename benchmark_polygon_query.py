@@ -1,4 +1,4 @@
-from scripts.generate_data import generate_blobs_sdata
+from scripts.generate_data import generate_blobs_sdata, add_circle_polygon
 from scripts.mpl_path import run_mpl_path
 from scripts.sdata_polygon_query import run_sdata_polygon_query
 import pandas as pd
@@ -22,8 +22,10 @@ if __name__ == "__main__":
     execution_times = []
 
     for n_points in n_points_values:
+        result_indices = []
         sdata = generate_blobs_sdata(n_points)
-        polygon = sdata["blobs_polygons"].geometry.iloc[2]
+        polygon = add_circle_polygon(sdata, has_hole=True, radius=10.1)
+        # polygon = sdata["blobs_polygons"].geometry.iloc[2]
         for method in methods:
             method_name = method.__name__
             for i in range(n_repeats):
@@ -38,6 +40,12 @@ if __name__ == "__main__":
                     "repetition": i,
                 }
                 execution_times.append(row)
+            result_indices.append(result.index)
+            print(f"Result shape: {result.shape} for method: {method_name}")
+
+        # make sure all results are the same
+        for result_index in result_indices:
+            assert (result_index == result_indices[0]).all(), "Results are not the same"
 
     # convert to dataframe
     execution_times_df = pd.DataFrame(execution_times)
