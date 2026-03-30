@@ -52,10 +52,12 @@ pixi run asv compare main HEAD
 
 ### CPU profiling with py-spy
 
-Pass the script to profile after `--`:
-
 ```bash
-pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
+# Default (profiles scripts/benchmark_polygon_query.py)
+pixi run profile-pyspy
+
+# Override the script via env var
+PROFILE_SCRIPT=scripts/other.py pixi run profile-pyspy
 ```
 
 This writes `profile.speedscope.json`. Open it with:
@@ -66,9 +68,9 @@ speedscope profile.speedscope.json   # requires: npm install -g speedscope
 
 > **macOS note:** py-spy may require `sudo` to attach to the process:
 > ```bash
-> sudo pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
+> sudo PROFILE_SCRIPT=scripts/benchmark_polygon_query.py pixi run profile-pyspy
 > ```
-> If `sudo` changes PATH, pass the full pixi Python path directly:
+> If `sudo` changes PATH, run py-spy directly:
 > ```bash
 > sudo py-spy record --gil -o profile.speedscope.json --format speedscope \
 >     -- .pixi/envs/default/bin/python scripts/benchmark_polygon_query.py
@@ -86,8 +88,8 @@ py-spy record --rate 200 --gil -o profile.speedscope.json --format speedscope \
 Two steps — record, then report:
 
 ```bash
-# Step 1: run the script under memray (pass the script after --)
-pixi run profile-memray -- scripts/benchmark_polygon_query.py
+# Step 1: record (default script; override with PROFILE_SCRIPT=other.py)
+pixi run profile-memray
 
 # Step 2: generate the HTML temporal flame graph
 pixi run profile-memray-report

@@ -80,19 +80,28 @@ bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
 # Generate HTML report and open a local preview server
 bench-report = { cmd = "asv publish && asv preview" }
 
+profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin" }
+
 # --- CPU profiling with py-spy ---------------------------------------------
-# The script to profile is passed after '--':
-#   pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
+# Default script: scripts/benchmark_polygon_query.py
+# Override:  PROFILE_SCRIPT=other.py pixi run profile-pyspy
 # On macOS this may require sudo; see README for details.
 # Open the result with: speedscope profile.speedscope.json
-profile-pyspy = { cmd = "py-spy record --gil -o profile.speedscope.json --format speedscope -- python" }
+
+[tool.pixi.tasks.profile-pyspy]
+cmd = "py-spy record --gil -o profile.speedscope.json --format speedscope -- python $PROFILE_SCRIPT"
+
+[tool.pixi.tasks.profile-pyspy.env]
+PROFILE_SCRIPT = "scripts/benchmark_polygon_query.py"
 
 # --- Memory profiling with memray ------------------------------------------
-# Step 1 – run the script under memray (pass the script after '--'):
-#   pixi run profile-memray -- scripts/benchmark_polygon_query.py
-# Output: memray-output.bin
-profile-memray = { cmd = "memray run -o memray-output.bin" }
-# Step 2 – generate the HTML flame graph from the recorded data:
-#   pixi run profile-memray-report
-# Output: memray-flamegraph-memray-output.html
-profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin" }
+# Default script: scripts/benchmark_polygon_query.py
+# Override:  PROFILE_SCRIPT=other.py pixi run profile-memray
+# Step 1 – record; output: memray-output.bin
+# Step 2 – run profile-memray-report; output: memray-flamegraph-memray-output.html
+
+[tool.pixi.tasks.profile-memray]
+cmd = "memray run -o memray-output.bin $PROFILE_SCRIPT"
+
+[tool.pixi.tasks.profile-memray.env]
+PROFILE_SCRIPT = "scripts/benchmark_polygon_query.py"
