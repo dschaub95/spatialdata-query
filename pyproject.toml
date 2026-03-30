@@ -77,8 +77,8 @@ bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-s
 bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
 # Full run (3 repeats) — results saved to .asv/results/
 bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
-# Generate HTML report and open a local preview server
-bench-report = { cmd = "asv publish && asv preview" }
+# Print latest benchmark results to the terminal
+bench-report = { cmd = "asv show" }
 
 profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin && open memray-flamegraph-memray-output.html" }
 
