@@ -83,8 +83,9 @@ bench-report = { cmd = "asv publish && asv preview" }
 profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin && open memray-flamegraph-memray-output.html" }
 
 # --- CPU profiling with py-spy ---------------------------------------------
-# Default script: scripts/benchmark_polygon_query.py
-# Override:  PROFILE_SCRIPT=other.py pixi run profile-pyspy
+# Default script: scripts/profile_spatialdata_query.py
+# Override with mpl-path strategy:
+#   PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-pyspy
 # On macOS this may require sudo; see README for details.
 # Open the result with: speedscope profile.speedscope.json
 
@@ -92,11 +93,12 @@ profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin 
 cmd = "py-spy record --gil -o profile.speedscope.json --format speedscope -- python $PROFILE_SCRIPT"
 
 [tool.pixi.tasks.profile-pyspy.env]
-PROFILE_SCRIPT = "scripts/benchmark_polygon_query.py"
+PROFILE_SCRIPT = "scripts/profile_spatialdata_query.py"
 
 # --- Memory profiling with memray ------------------------------------------
-# Default script: scripts/benchmark_polygon_query.py
-# Override:  PROFILE_SCRIPT=other.py pixi run profile-memray
+# Default script: scripts/profile_spatialdata_query.py
+# Override with mpl-path strategy:
+#   PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-memray
 # Step 1 – record; output: memray-output.bin
 # Step 2 – run profile-memray-report; output: memray-flamegraph-memray-output.html
 
@@ -104,4 +106,4 @@ PROFILE_SCRIPT = "scripts/benchmark_polygon_query.py"
 cmd = "memray run -o memray-output.bin $PROFILE_SCRIPT"
 
 [tool.pixi.tasks.profile-memray.env]
-PROFILE_SCRIPT = "scripts/benchmark_polygon_query.py"
+PROFILE_SCRIPT = "scripts/profile_spatialdata_query.py"

@@ -57,12 +57,19 @@ pixi run asv compare main HEAD
 
 ### CPU profiling with py-spy
 
+Each query strategy has its own standalone script under `scripts/`:
+
+| Script | Strategy |
+|--------|----------|
+| `scripts/profile_spatialdata_query.py` | `spatialdata.polygon_query` (default) |
+| `scripts/profile_mpl_path.py` | matplotlib-path approach |
+
 ```bash
-# Default (profiles scripts/benchmark_polygon_query.py)
+# Default — profiles the spatialdata strategy
 pixi run profile-pyspy
 
-# Override the script via env var
-PROFILE_SCRIPT=scripts/other.py pixi run profile-pyspy
+# Profile the matplotlib-path strategy instead
+PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-pyspy
 ```
 
 This writes `profile.speedscope.json`. Open it with:
@@ -73,44 +80,37 @@ speedscope profile.speedscope.json   # requires: npm install -g speedscope
 
 > **macOS note:** py-spy may require `sudo` to attach to the process:
 > ```bash
-> sudo PROFILE_SCRIPT=scripts/benchmark_polygon_query.py pixi run profile-pyspy
+> sudo PROFILE_SCRIPT=scripts/profile_spatialdata_query.py pixi run profile-pyspy
 > ```
 > If `sudo` changes PATH, run py-spy directly:
 > ```bash
 > sudo py-spy record --gil -o profile.speedscope.json --format speedscope \
->     -- .pixi/envs/default/bin/python scripts/benchmark_polygon_query.py
+>     -- .pixi/envs/default/bin/python scripts/profile_spatialdata_query.py
 > ```
 
 To tweak the sampling rate or other py-spy flags, run it directly:
 
 ```bash
 py-spy record --rate 200 --gil -o profile.speedscope.json --format speedscope \
-    -- python scripts/benchmark_polygon_query.py
+    -- python scripts/profile_spatialdata_query.py
 ```
 
 ### Memory profiling with memray
 
-Two steps — record, then report:
-
 ```bash
-# Step 1: record (default script; override with PROFILE_SCRIPT=other.py)
+# Default — profiles the spatialdata strategy; two steps: record then report
 pixi run profile-memray
+pixi run profile-memray-report   # opens memray-flamegraph-memray-output.html
 
-# Step 2: generate the HTML temporal flame graph
+# Profile the matplotlib-path strategy instead
+PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-memray
 pixi run profile-memray-report
-```
-
-Output: `memray-flamegraph-memray-output.html`. Open in a browser:
-
-```bash
-open memray-flamegraph-memray-output.html   # macOS
-xdg-open memray-flamegraph-memray-output.html  # Linux
 ```
 
 To tweak the report format or output path, run memray directly:
 
 ```bash
-memray run -o memray-output.bin scripts/benchmark_polygon_query.py
+memray run -o memray-output.bin scripts/profile_spatialdata_query.py
 memray flamegraph memray-output.bin              # non-temporal flamegraph
 memray flamegraph --temporal memray-output.bin   # temporal flamegraph
 memray summary memray-output.bin                 # text summary
