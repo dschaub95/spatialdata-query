@@ -22,6 +22,8 @@ pixi install
 
 ```bash
 uv venv && source .venv/bin/activate && uv pip install -e .
+# Also install profiling tools:
+uv pip install -e ".[profiling]"
 ```
 
 ---
@@ -38,8 +40,8 @@ uv venv && source .venv/bin/activate && uv pip install -e .
 | `pixi run bench-full` | Full run (3 repeats) — results saved to `.asv/results/` |
 | `pixi run bench-report` | Publish results and open an interactive HTML report |
 
-To tweak parameters (number of repeats, specific commits, comparison between
-branches) run the underlying `asv` command directly, e.g.:
+To tweak parameters (number of repeats, specific commits, branch comparison)
+run the underlying `asv` command directly, e.g.:
 
 ```bash
 # Compare HEAD against main
@@ -50,13 +52,13 @@ pixi run asv compare main HEAD
 
 ### CPU profiling with py-spy
 
+Pass the script to profile after `--`:
+
 ```bash
-pixi run profile-pyspy
+pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
 ```
 
-This records a [speedscope](https://www.speedscope.app) flame graph of
-`scripts/benchmark_polygon_query.py` and writes `profile.speedscope.json`.
-Open it with:
+This writes `profile.speedscope.json`. Open it with:
 
 ```bash
 speedscope profile.speedscope.json   # requires: npm install -g speedscope
@@ -64,16 +66,15 @@ speedscope profile.speedscope.json   # requires: npm install -g speedscope
 
 > **macOS note:** py-spy may require `sudo` to attach to the process:
 > ```bash
-> sudo pixi run profile-pyspy
+> sudo pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
 > ```
-> If `sudo` changes the PATH, use the full path to the pixi-managed Python, e.g.:
+> If `sudo` changes PATH, pass the full pixi Python path directly:
 > ```bash
 > sudo py-spy record --gil -o profile.speedscope.json --format speedscope \
->     -- /path/to/.pixi/envs/default/bin/python scripts/benchmark_polygon_query.py
+>     -- .pixi/envs/default/bin/python scripts/benchmark_polygon_query.py
 > ```
 
-To tweak which script is profiled or which methods are sampled, run `py-spy`
-directly with custom flags:
+To tweak the sampling rate or other py-spy flags, run it directly:
 
 ```bash
 py-spy record --rate 200 --gil -o profile.speedscope.json --format speedscope \
@@ -82,20 +83,24 @@ py-spy record --rate 200 --gil -o profile.speedscope.json --format speedscope \
 
 ### Memory profiling with memray
 
+Two steps — record, then report:
+
 ```bash
-pixi run profile-memray
+# Step 1: run the script under memray (pass the script after --)
+pixi run profile-memray -- scripts/benchmark_polygon_query.py
+
+# Step 2: generate the HTML temporal flame graph
+pixi run profile-memray-report
 ```
 
-This runs `scripts/benchmark_polygon_query.py` under memray, writes
-`memray-output.bin`, and generates a temporal HTML flame graph
-(`memray-flamegraph-memray-output.html`). Open the HTML file in a browser:
+Output: `memray-flamegraph-memray-output.html`. Open in a browser:
 
 ```bash
 open memray-flamegraph-memray-output.html   # macOS
 xdg-open memray-flamegraph-memray-output.html  # Linux
 ```
 
-To tweak the report format or file path, run memray directly:
+To tweak the report format or output path, run memray directly:
 
 ```bash
 memray run -o memray-output.bin scripts/benchmark_polygon_query.py
@@ -123,6 +128,6 @@ Each class follows the ASV convention:
 
 `scripts/benchmark_polygon_query.py` is a standalone script used by the
 py-spy and memray tasks. It benchmarks the same two polygon-query methods
-(`run_sdata_polygon_query` and `run_mpl_path`) and also verifies that both
-methods return identical results. Edit `n_points_values` and `n_repeats` at
-the top of the file to adjust the dataset size and repetition count.
+(`run_sdata_polygon_query` and `run_mpl_path`) and verifies that both return
+identical results. Edit `n_points_values` and `n_repeats` at the top of the
+file to adjust the dataset size and repetition count before profiling.

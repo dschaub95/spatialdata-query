@@ -48,3 +48,51 @@ packages = ["scripts"]
 
 [tool.pytest]
 testpaths = ["tests"]
+
+# ---------------------------------------------------------------------------
+# pixi — environment and task runner
+# ---------------------------------------------------------------------------
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10,<3.13"
+# Geospatial system libraries required to build pyproj / geopandas from PyPI
+proj = "*"
+libspatialindex = "*"
+
+[tool.pixi.pypi-dependencies]
+spatialdata-query-benchmarks = { path = ".", editable = true }
+asv = "*"
+py-spy = "*"
+memray = "*"
+
+[tool.pixi.tasks]
+# --- ASV benchmarks --------------------------------------------------------
+# Quick sanity check (1 repeat, all benchmark suites)
+bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
+# Quick check of a single suite
+bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --quick --show-stderr -v" }
+bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --quick --show-stderr -v" }
+# Full run (3 repeats) — results saved to .asv/results/
+bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
+# Generate HTML report and open a local preview server
+bench-report = { cmd = "asv publish && asv preview" }
+
+# --- CPU profiling with py-spy ---------------------------------------------
+# The script to profile is passed after '--':
+#   pixi run profile-pyspy -- scripts/benchmark_polygon_query.py
+# On macOS this may require sudo; see README for details.
+# Open the result with: speedscope profile.speedscope.json
+profile-pyspy = { cmd = "py-spy record --gil -o profile.speedscope.json --format speedscope -- python" }
+
+# --- Memory profiling with memray ------------------------------------------
+# Step 1 – run the script under memray (pass the script after '--'):
+#   pixi run profile-memray -- scripts/benchmark_polygon_query.py
+# Output: memray-output.bin
+profile-memray = { cmd = "memray run -o memray-output.bin" }
+# Step 2 – generate the HTML flame graph from the recorded data:
+#   pixi run profile-memray-report
+# Output: memray-flamegraph-memray-output.html
+profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin" }
