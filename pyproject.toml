@@ -80,7 +80,7 @@ bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
 # Generate HTML report and open a local preview server
 bench-report = { cmd = "asv publish && asv preview" }
 
-profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin" }
+profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin && open memray-flamegraph-memray-output.html" }
 
 # --- CPU profiling with py-spy ---------------------------------------------
 # Default script: scripts/benchmark_polygon_query.py
