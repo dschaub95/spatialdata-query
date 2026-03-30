@@ -1,0 +1,13 @@
+{
+    "version": 1,
+    "project": "spatialdata-query",
+    "project_url": "https://github.com/dschaub95/spatialdata-query",
+    "repo": ".",
+    "benchmark_dir": "benchmarks",
+    "environment_type": "virtualenv",
+    "show_commit_url": "https://github.com/dschaub95/spatialdata-query/commit/",
+    "results_dir": ".asv/results",
+    "html_dir": ".asv/html",
+    "build_command": ["pip install -e . --no-deps"],
+    "branches": ["main"]
+}

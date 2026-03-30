@@ -1,2 +1,9 @@
 **/__pycache__/**
 figures/**
+.pixi/
+.asv/
+.idea/
+pixi.lock
+memray-output.bin
+memray-flamegraph-*.html
+profile.speedscope.json

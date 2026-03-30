@@ -14,13 +14,15 @@ authors = [
 ]
 
 dependencies = [
-    "snakemake>=7.32.4",
+    "spatialdata",
+    "shapely",
     "pandas>=2.0.0",
     "numpy>=1.22.0",
     "matplotlib>=3.5.0",
     "seaborn>=0.12.0",
     "dask>=2023.3.0",
     "pyarrow>=14.0.0",
+    "asv",
 ]
 
 [project.optional-dependencies]
@@ -28,6 +30,10 @@ dev = [
     "pytest>=7.0.0",
     "black>=23.0.0",
     "isort>=5.12.0",
+]
+profiling = [
+    "py-spy",
+    "memray",
 ]
 
 [tool.black]
@@ -37,5 +43,69 @@ line-length = 100
 profile = "black"
 line_length = 100
 
+[tool.hatch.build.targets.wheel]
+packages = ["scripts", "utils"]
+
 [tool.pytest]
 testpaths = ["tests"]
+
+# ---------------------------------------------------------------------------
+# pixi — environment and task runner
+# ---------------------------------------------------------------------------
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10,<3.13"
+# Geospatial system libraries required to build pyproj / geopandas from PyPI
+proj = "*"
+libspatialindex = "*"
+
+[tool.pixi.pypi-dependencies]
+spatialdata = { path = "../spatialdata", editable = true }
+spatialdata-query-benchmarks = { path = ".", editable = true }
+asv = "*"
+py-spy = "*"
+memray = "*"
+
+[tool.pixi.tasks]
+# --- ASV benchmarks --------------------------------------------------------
+# Quick sanity check (1 repeat, all benchmark suites)
+bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
+# Full run of a single suite — results saved to .asv/results/
+bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v" }
+bench-bbox-points = { cmd = "asv run --python=same -b BoundingBoxQueryPointsBenchmark --show-stderr -v" }
+bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
+# Full run (3 repeats) — results saved to .asv/results/
+bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
+# Show results for the current commit (run bench-quick or bench-full first)
+bench-report = { cmd = "asv show HEAD" }
+
+profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin && open memray-flamegraph-memray-output.html" }
+
+# --- CPU profiling with py-spy ---------------------------------------------
+# Default script: scripts/queries/sdata_polygon_query.py
+# Override with mpl-path strategy:
+#   PROFILE_SCRIPT=scripts/queries/mpl_path.py pixi run profile-pyspy
+# On macOS this may require sudo; see README for details.
+# Open the result with: speedscope profile.speedscope.json
+
+[tool.pixi.tasks.profile-pyspy]
+cmd = "py-spy record --gil -o profile.speedscope.json --format speedscope -- python $PROFILE_SCRIPT"
+
+[tool.pixi.tasks.profile-pyspy.env]
+PROFILE_SCRIPT = "scripts/queries/sdata_polygon_query.py"
+
+# --- Memory profiling with memray ------------------------------------------
+# Default script: scripts/queries/sdata_polygon_query.py
+# Override with mpl-path strategy:
+#   PROFILE_SCRIPT=scripts/queries/mpl_path.py pixi run profile-memray
+# Step 1 – record; output: memray-output.bin
+# Step 2 – run profile-memray-report; output: memray-flamegraph-memray-output.html
+
+[tool.pixi.tasks.profile-memray]
+cmd = "memray run -o memray-output.bin $PROFILE_SCRIPT"
+
+[tool.pixi.tasks.profile-memray.env]
+PROFILE_SCRIPT = "scripts/queries/sdata_polygon_query.py"
