@@ -12,9 +12,6 @@ Running (full, multiple repeats):
 Comparing two commits:
     asv continuous --python=same main <branch> -b DataOperationsBenchmark --show-stderr -v
     asv compare main <branch>
-
-HTML report:
-    asv publish && asv preview
 """
 
 import tempfile
@@ -56,28 +53,38 @@ class DataOperationsBenchmark:
 
     def time_write_parquet(self, n_points: int) -> None:
         """Walltime for pandas DataFrame.to_parquet."""
-        path = str(Path(self._tmpdir.name) / "write_bench.parquet")
-        self.df.to_parquet(path)
+        from scripts.data.parquet_ops import write_parquet
+
+        write_parquet(self.df, str(Path(self._tmpdir.name) / "write_bench.parquet"))
 
     def time_read_parquet(self, n_points: int) -> None:
         """Walltime for pandas read_parquet."""
-        pd.read_parquet(self.parquet_path)
+        from scripts.data.parquet_ops import read_parquet
+
+        read_parquet(self.parquet_path)
 
     def time_dask_compute(self, n_points: int) -> None:
         """Walltime for dask DataFrame.compute (in-memory partition concat)."""
-        self.ddf.compute()
+        from scripts.data.parquet_ops import dask_compute
+
+        dask_compute(self.ddf)
 
     # ---- peak-memory benchmarks -------------------------------------------
 
     def peakmem_write_parquet(self, n_points: int) -> None:
         """Peak memory for pandas DataFrame.to_parquet."""
-        path = str(Path(self._tmpdir.name) / "write_bench_mem.parquet")
-        self.df.to_parquet(path)
+        from scripts.data.parquet_ops import write_parquet
+
+        write_parquet(self.df, str(Path(self._tmpdir.name) / "write_bench_mem.parquet"))
 
     def peakmem_read_parquet(self, n_points: int) -> None:
         """Peak memory for pandas read_parquet."""
-        pd.read_parquet(self.parquet_path)
+        from scripts.data.parquet_ops import read_parquet
+
+        read_parquet(self.parquet_path)
 
     def peakmem_dask_compute(self, n_points: int) -> None:
         """Peak memory for dask DataFrame.compute."""
-        self.ddf.compute()
+        from scripts.data.parquet_ops import dask_compute
+
+        dask_compute(self.ddf)

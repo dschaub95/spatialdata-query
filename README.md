@@ -14,10 +14,10 @@ pixi run bench-data           # benchmark data I/O (saves results)
 pixi run bench-report         # show latest results in terminal
 
 pixi run profile-pyspy        # CPU flame graph  → profile.speedscope.json  (spatialdata strategy)
-PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-pyspy   # mpl-path strategy
+PROFILE_SCRIPT=scripts/queries/mpl_path.py pixi run profile-pyspy   # mpl-path strategy
 
 pixi run profile-memray       # memory recording → memray-output.bin  (spatialdata strategy)
-PROFILE_SCRIPT=scripts/profile_mpl_path.py pixi run profile-memray  # mpl-path strategy
+PROFILE_SCRIPT=scripts/queries/mpl_path.py pixi run profile-memray  # mpl-path strategy
 pixi run profile-memray-report  # flame graph    → opens in browser
 ```
 
@@ -34,6 +34,33 @@ pixi install          # recommended (conda-forge + PyPI, all deps)
 uv venv && source .venv/bin/activate
 uv pip install -e ".[profiling]"
 ```
+
+---
+
+## Dependencies
+
+By default `spatialdata` is installed from PyPI.
+
+To benchmark against a **local checkout** (e.g. a dev branch):
+
+**pixi** — add it to `[tool.pixi.pypi-dependencies]` in `pyproject.toml` (pixi overrides the PyPI version):
+
+```toml
+[tool.pixi.pypi-dependencies]
+spatialdata = { path = "../spatialdata", editable = true }
+```
+
+Then re-run `pixi install`.
+
+**uv / venv** — install the local version on top of the existing environment:
+
+```bash
+uv pip install -e ../spatialdata
+# or
+pip install -e ../spatialdata
+```
+
+To go back to the PyPI version, remove the override from `pyproject.toml` and re-run `pixi install`, or run `pip install spatialdata` in the venv.
 
 ---
 

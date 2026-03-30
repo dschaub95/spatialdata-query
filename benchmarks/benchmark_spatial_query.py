@@ -13,9 +13,6 @@ Running (full, multiple repeats):
 Comparing two commits:
     asv continuous --python=same main <branch> -b SpatialQueryBenchmark --show-stderr -v
     asv compare main <branch>
-
-HTML report:
-    asv publish && asv preview
 """
 
 
@@ -32,31 +29,31 @@ class SpatialQueryBenchmark:
     param_names = ["n_points"]
 
     def setup(self, n_points: int) -> None:
-        from scripts.generate_data import add_circle_polygon, generate_blobs_sdata
+        from utils.generate_data import add_circle_polygon, generate_blobs_sdata
 
         self.sdata = generate_blobs_sdata(n_points)
         self.polygon = add_circle_polygon(self.sdata, has_hole=True, radius=10.1)
 
     def time_mpl_path(self, n_points: int) -> None:
         """Walltime for matplotlib-path polygon query."""
-        from scripts.mpl_path import run_mpl_path
+        from scripts.queries.mpl_path import run_mpl_path
 
         run_mpl_path(self.sdata, self.polygon)
 
     def time_spatialdata_query(self, n_points: int) -> None:
         """Walltime for spatialdata.polygon_query."""
-        from scripts.sdata_polygon_query import run_sdata_polygon_query
+        from scripts.queries.sdata_polygon_query import run_sdata_polygon_query
 
         run_sdata_polygon_query(self.sdata, self.polygon)
 
     def peakmem_mpl_path(self, n_points: int) -> None:
         """Peak memory for matplotlib-path polygon query."""
-        from scripts.mpl_path import run_mpl_path
+        from scripts.queries.mpl_path import run_mpl_path
 
         run_mpl_path(self.sdata, self.polygon)
 
     def peakmem_spatialdata_query(self, n_points: int) -> None:
         """Peak memory for spatialdata.polygon_query."""
-        from scripts.sdata_polygon_query import run_sdata_polygon_query
+        from scripts.queries.sdata_polygon_query import run_sdata_polygon_query
 
         run_sdata_polygon_query(self.sdata, self.polygon)
