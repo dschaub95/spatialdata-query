@@ -32,13 +32,18 @@ uv pip install -e ".[profiling]"
 
 ### ASV benchmarks
 
-| Task | What it does |
-|------|-------------|
-| `pixi run bench-quick` | Run all benchmarks once (quick sanity check) |
-| `pixi run bench-spatial` | Quick run of `SpatialQueryBenchmark` only |
-| `pixi run bench-data` | Quick run of `DataOperationsBenchmark` only |
-| `pixi run bench-full` | Full run (3 repeats) — results saved to `.asv/results/` |
-| `pixi run bench-report` | Publish results and open an interactive HTML report |
+| Task | Saves results | What it does |
+|------|:---:|-------------|
+| `pixi run bench-quick` | No | Sanity check — runs every benchmark once to confirm nothing crashes |
+| `pixi run bench-spatial` | Yes | Full run of `SpatialQueryBenchmark` only (3 repeats) |
+| `pixi run bench-data` | Yes | Full run of `DataOperationsBenchmark` only (3 repeats) |
+| `pixi run bench-full` | Yes | Full run of all benchmark suites (3 repeats) |
+| `pixi run bench-report` | — | Publish saved results and open an interactive HTML report |
+
+> **Note:** `bench-quick` does **not** save results to `.asv/results/`, so
+> running it before `bench-report` will produce an empty report with 404 errors
+> for all graphs. Use `bench-spatial`, `bench-data`, or `bench-full` to
+> generate results that `bench-report` can display.
 
 To tweak parameters (number of repeats, specific commits, branch comparison)
 run the underlying `asv` command directly, e.g.:

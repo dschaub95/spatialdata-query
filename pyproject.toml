@@ -72,9 +72,9 @@ memray = "*"
 # --- ASV benchmarks --------------------------------------------------------
 # Quick sanity check (1 repeat, all benchmark suites)
 bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
-# Quick check of a single suite
-bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --quick --show-stderr -v" }
-bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --quick --show-stderr -v" }
+# Full run of a single suite — results saved to .asv/results/
+bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v" }
+bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
 # Full run (3 repeats) — results saved to .asv/results/
 bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
 # Generate HTML report and open a local preview server
