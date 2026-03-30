@@ -75,6 +75,7 @@ memray = "*"
 bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
 # Full run of a single suite — results saved to .asv/results/
 bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v" }
+bench-bbox-points = { cmd = "asv run --python=same -b BoundingBoxQueryPointsBenchmark --show-stderr -v" }
 bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
 # Full run (3 repeats) — results saved to .asv/results/
 bench-full   = { cmd = "asv run --python=same --show-stderr -v" }

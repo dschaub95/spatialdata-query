@@ -10,6 +10,7 @@ Benchmarks for spatial polygon query operations using [SpatialData](https://spat
 pixi install                  # set up environment
 
 pixi run bench-spatial        # benchmark spatial query (saves results)
+pixi run bench-bbox-points    # benchmark bbox vs equivalent-rectangle polygon point queries
 pixi run bench-data           # benchmark data I/O (saves results)
 pixi run bench-report         # show latest results in terminal
 
@@ -72,11 +73,14 @@ To go back to the PyPI version, remove the override from `pyproject.toml` and re
 |------|:---:|-------------|
 | `bench-quick` | No | Crash-check — one run, no results written |
 | `bench-spatial` | Yes | `SpatialQueryBenchmark` — 3 repeats |
+| `bench-bbox-points` | Yes | `BoundingBoxQueryPointsBenchmark` — 3 repeats |
 | `bench-data` | Yes | `DataOperationsBenchmark` — 3 repeats |
 | `bench-full` | Yes | All suites — 3 repeats |
 | `bench-report` | — | Print latest results to terminal |
 
-#### Dataset selection for `SpatialQueryBenchmark`
+#### Dataset selection for spatial query benchmarks
+
+The same dataset selection applies to both `SpatialQueryBenchmark` and `BoundingBoxQueryPointsBenchmark`.
 
 By default the benchmark generates **synthetic blobs** at multiple point counts (`1e5`, `1e6`).
 
@@ -85,12 +89,15 @@ Set `SDATA_BENCHMARK_DATASET=real` to benchmark against the **Xenium 2.0 zarr** 
 ```bash
 # synthetic (default) — multiple sizes
 pixi run bench-spatial
+pixi run bench-bbox-points
 
 # real data — single size
 SDATA_BENCHMARK_DATASET=real pixi run bench-spatial
+SDATA_BENCHMARK_DATASET=real pixi run bench-bbox-points
 
 # override the zarr path (defaults to spatialdata-sandbox/xenium_2.0.0_io/data.zarr)
 SDATA_BENCHMARK_DATASET=real SDATA_REAL_DATA_PATH=/path/to/data.zarr pixi run bench-spatial
+SDATA_BENCHMARK_DATASET=real SDATA_REAL_DATA_PATH=/path/to/data.zarr pixi run bench-bbox-points
 ```
 
 The Xenium dataset can be obtained from the [spatialdata docs](https://spatialdata.scverse.org) or by running `download.py` and then `to_zarr.py` in `spatialdata-sandbox`.
