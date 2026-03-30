@@ -63,6 +63,7 @@ proj = "*"
 libspatialindex = "*"
 
 [tool.pixi.pypi-dependencies]
+spatialdata = { path = "../spatialdata", editable = true }
 spatialdata-query-benchmarks = { path = ".", editable = true }
 asv = "*"
 py-spy = "*"
@@ -71,12 +72,12 @@ memray = "*"
 [tool.pixi.tasks]
 # --- ASV benchmarks --------------------------------------------------------
 # Quick sanity check (1 repeat, all benchmark suites)
-bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v HEAD^!" }
+bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
 # Full run of a single suite — results saved to .asv/results/
-bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v HEAD^!" }
-bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v HEAD^!" }
+bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v" }
+bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
 # Full run (3 repeats) — results saved to .asv/results/
-bench-full   = { cmd = "asv run --python=same --show-stderr -v HEAD^!" }
+bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
 # Show results for the current commit (run bench-quick or bench-full first)
 bench-report = { cmd = "asv show HEAD" }
 
