@@ -14,13 +14,15 @@ authors = [
 ]
 
 dependencies = [
-    "snakemake>=7.32.4",
+    "spatialdata",
+    "shapely",
     "pandas>=2.0.0",
     "numpy>=1.22.0",
     "matplotlib>=3.5.0",
     "seaborn>=0.12.0",
     "dask>=2023.3.0",
     "pyarrow>=14.0.0",
+    "asv",
 ]
 
 [project.optional-dependencies]
@@ -29,6 +31,10 @@ dev = [
     "black>=23.0.0",
     "isort>=5.12.0",
 ]
+profiling = [
+    "py-spy",
+    "memray",
+]
 
 [tool.black]
 line-length = 100
@@ -36,6 +42,9 @@ line-length = 100
 [tool.isort]
 profile = "black"
 line_length = 100
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
 
 [tool.pytest]
 testpaths = ["tests"]
