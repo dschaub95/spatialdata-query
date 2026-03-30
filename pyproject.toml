@@ -71,14 +71,14 @@ memray = "*"
 [tool.pixi.tasks]
 # --- ASV benchmarks --------------------------------------------------------
 # Quick sanity check (1 repeat, all benchmark suites)
-bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v" }
+bench-quick = { cmd = "asv run --python=same --quick --show-stderr -v HEAD^!" }
 # Full run of a single suite — results saved to .asv/results/
-bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v" }
-bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v" }
+bench-spatial = { cmd = "asv run --python=same -b SpatialQueryBenchmark --show-stderr -v HEAD^!" }
+bench-data    = { cmd = "asv run --python=same -b DataOperationsBenchmark --show-stderr -v HEAD^!" }
 # Full run (3 repeats) — results saved to .asv/results/
-bench-full   = { cmd = "asv run --python=same --show-stderr -v" }
-# Print results for the current commit (run bench-quick or bench-full first)
-bench-report = { cmd = "asv show $(git rev-parse HEAD)" }
+bench-full   = { cmd = "asv run --python=same --show-stderr -v HEAD^!" }
+# Show results for the current commit (run bench-quick or bench-full first)
+bench-report = { cmd = "asv show HEAD" }
 
 profile-memray-report = { cmd = "memray flamegraph --temporal memray-output.bin && open memray-flamegraph-memray-output.html" }
 

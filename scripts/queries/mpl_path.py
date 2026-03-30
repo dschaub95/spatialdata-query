@@ -102,12 +102,13 @@ def polygon_query_mpl(points: DaskDataFrame, polygon):
 if __name__ == "__main__":
     import time
 
-    from utils.dataset import DATASET, load_dataset
+    from utils.dataset import DATASET, load_dataset, make_polygon
 
     dataset = "real" if DATASET == "real" else int(1e6)
 
-    sdata, polygon, points_key = load_dataset(dataset)
+    sdata, element_key = load_dataset(dataset, "points")
+    polygon = make_polygon(sdata)
     t0 = time.perf_counter()
-    result = run_mpl_path(sdata, polygon, points_key)
+    result = run_mpl_path(sdata, polygon, element_key)
     elapsed = time.perf_counter() - t0
     print(f"dataset={dataset!r}  time={elapsed:.3f}s  result={result.shape}")

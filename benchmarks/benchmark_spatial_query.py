@@ -49,30 +49,31 @@ class SpatialQueryBenchmark:
     param_names = ["dataset"]
 
     def setup(self, dataset) -> None:
-        from utils.dataset import load_dataset
+        from utils.dataset import load_dataset, make_polygon
 
-        self.sdata, self.polygon, self.points_key = load_dataset(dataset)
+        self.sdata, self.element_key = load_dataset(dataset, "points")
+        self.polygon = make_polygon(self.sdata)
 
     def time_mpl_path(self, dataset) -> None:
         """Walltime for matplotlib-path polygon query."""
         from scripts.queries.mpl_path import run_mpl_path
 
-        run_mpl_path(self.sdata, self.polygon, self.points_key)
+        run_mpl_path(self.sdata, self.polygon, self.element_key)
 
     def time_spatialdata_query(self, dataset) -> None:
         """Walltime for spatialdata.polygon_query."""
-        from scripts.queries.sdata_polygon_query import run_sdata_polygon_query
+        from scripts.queries.sdata_polygon_query_points import run_sdata_polygon_query_points
 
-        run_sdata_polygon_query(self.sdata, self.polygon, self.points_key)
+        run_sdata_polygon_query_points(self.sdata, self.polygon, self.element_key)
 
     def peakmem_mpl_path(self, dataset) -> None:
         """Peak memory for matplotlib-path polygon query."""
         from scripts.queries.mpl_path import run_mpl_path
 
-        run_mpl_path(self.sdata, self.polygon, self.points_key)
+        run_mpl_path(self.sdata, self.polygon, self.element_key)
 
     def peakmem_spatialdata_query(self, dataset) -> None:
         """Peak memory for spatialdata.polygon_query."""
-        from scripts.queries.sdata_polygon_query import run_sdata_polygon_query
+        from scripts.queries.sdata_polygon_query_points import run_sdata_polygon_query_points
 
-        run_sdata_polygon_query(self.sdata, self.polygon, self.points_key)
+        run_sdata_polygon_query_points(self.sdata, self.polygon, self.element_key)
