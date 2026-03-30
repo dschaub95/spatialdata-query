@@ -43,21 +43,21 @@ By default `spatialdata` is installed from PyPI.
 
 To benchmark against a **local checkout** (e.g. a dev branch):
 
-**pixi** — add it to `[tool.pixi.pypi-dependencies]` in `pyproject.toml` (pixi overrides the PyPI version):
+**pixi** — add it to `[tool.pixi.pypi-dependencies]` in `pyproject.toml` (pixi overrides the PyPI version), replacing the path with the actual location of your local `spatialdata` clone:
 
 ```toml
 [tool.pixi.pypi-dependencies]
-spatialdata = { path = "../spatialdata", editable = true }
+spatialdata = { path = "/path/to/your/spatialdata", editable = true }
 ```
 
 Then re-run `pixi install`.
 
-**uv / venv** — install the local version on top of the existing environment:
+**uv / venv** — install the local version on top of the existing environment, replacing the path with the actual location of your local clone:
 
 ```bash
-uv pip install -e ../spatialdata
+uv pip install -e /path/to/your/spatialdata
 # or
-pip install -e ../spatialdata
+pip install -e /path/to/your/spatialdata
 ```
 
 To go back to the PyPI version, remove the override from `pyproject.toml` and re-run `pixi install`, or run `pip install spatialdata` in the venv.
@@ -75,6 +75,25 @@ To go back to the PyPI version, remove the override from `pyproject.toml` and re
 | `bench-data` | Yes | `DataOperationsBenchmark` — 3 repeats |
 | `bench-full` | Yes | All suites — 3 repeats |
 | `bench-report` | — | Print latest results to terminal |
+
+#### Dataset selection for `SpatialQueryBenchmark`
+
+By default the benchmark generates **synthetic blobs** at multiple point counts (`1e5`, `1e6`).
+
+Set `SDATA_BENCHMARK_DATASET=real` to benchmark against the **Xenium 2.0 zarr** instead — a single run at real dataset size (~12 M transcripts).
+
+```bash
+# synthetic (default) — multiple sizes
+pixi run bench-spatial
+
+# real data — single size
+SDATA_BENCHMARK_DATASET=real pixi run bench-spatial
+
+# override the zarr path (defaults to spatialdata-sandbox/xenium_2.0.0_io/data.zarr)
+SDATA_BENCHMARK_DATASET=real SDATA_REAL_DATA_PATH=/path/to/data.zarr pixi run bench-spatial
+```
+
+The Xenium dataset can be obtained from the [spatialdata docs](https://spatialdata.scverse.org) or by running `download.py` and then `to_zarr.py` in `spatialdata-sandbox`.
 
 Branch comparison:
 ```bash

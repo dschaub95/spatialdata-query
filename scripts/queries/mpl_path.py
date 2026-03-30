@@ -74,8 +74,8 @@ def polygon_to_path(polygon: Polygon | MultiPolygon) -> Path:
         raise ValueError("Invalid polygon type")
 
 
-def run_mpl_path(sdata, polygon):
-    return polygon_query_mpl(sdata["blobs_points"], polygon).compute()
+def run_mpl_path(sdata, polygon, points_key):
+    return polygon_query_mpl(sdata[points_key], polygon).compute()
 
 
 def polygon_query_mpl(points: DaskDataFrame, polygon):
@@ -102,20 +102,12 @@ def polygon_query_mpl(points: DaskDataFrame, polygon):
 if __name__ == "__main__":
     import time
 
-    from utils.generate_data import add_circle_polygon, generate_blobs_sdata
+    from utils.dataset import DATASET, load_dataset
 
-    n_points_values = [
-        int(1e5),
-        int(1e6),
-        # int(1e7),
-    ]
-    n_repeats = 2
+    dataset = "real" if DATASET == "real" else int(1e6)
 
-    for n_points in n_points_values:
-        sdata = generate_blobs_sdata(n_points)
-        polygon = add_circle_polygon(sdata, has_hole=True, radius=10.1)
-        for i in range(n_repeats):
-            t0 = time.perf_counter()
-            result = run_mpl_path(sdata, polygon)
-            elapsed = time.perf_counter() - t0
-            print(f"n_points={n_points:>8}  rep={i}  time={elapsed:.3f}s  result={result.shape}")
+    sdata, polygon, points_key = load_dataset(dataset)
+    t0 = time.perf_counter()
+    result = run_mpl_path(sdata, polygon, points_key)
+    elapsed = time.perf_counter() - t0
+    print(f"dataset={dataset!r}  time={elapsed:.3f}s  result={result.shape}")
